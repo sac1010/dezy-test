@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import Card from "./components/Card";
 import axios from "axios";
 
-// Define debounce function outside the component
 function debounce(func, delay = 1000) {
   let timeoutId;
 

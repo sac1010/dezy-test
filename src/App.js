@@ -5,23 +5,12 @@ import Card from "./components/Card";
 import axios from "axios";
 import SearchCard from "./components/SearchCard";
 
-function debounce(func, delay = 1000) {
-  let timeoutId;
-
-  return function () {
-    console.log("function called");
-    clearTimeout(timeoutId);
-
-    timeoutId = setTimeout(() => {
-      func();
-    }, delay);
-  };
-}
 
 function App() {
   const [search, setSearch] = useState("");
   const [data, setData] = useState([]);
   const [searchData, setSearchData] = useState();
+  let debounceTimeout = 0
 
   async function getData() {
     try {
@@ -42,8 +31,13 @@ function App() {
 
   useEffect(() => {
     console.log("searching ");
-    const debouncedGetData = debounce(getData);
-    debouncedGetData();
+    if (debounceTimeout) {
+      clearTimeout(debounceTimeout);
+    }
+
+    debounceTimeout = setTimeout(() => {
+      getData()
+    }, 1000);
   }, [search]);
 
   return (
@@ -91,7 +85,7 @@ function App() {
             gap: "20px",
           }}
         >
-          <SearchCard name = {searchData.forms[0].name}/>
+          <SearchCard name={searchData.forms[0].name} abilities = {searchData.abilities}/>
         </div>
       ) : (
         <div>No results found</div>

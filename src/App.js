@@ -1,24 +1,73 @@
-import logo from './logo.svg';
-import './App.css';
+import logo from "./logo.svg";
+import "./App.css";
+import { useEffect, useState } from "react";
+import Card from "./components/Card";
+import axios from "axios";
+
+// Define debounce function outside the component
+function debounce(func, delay = 1000) {
+  let timeoutId;
+
+  return function () {
+    console.log("function called");
+    clearTimeout(timeoutId);
+
+    timeoutId = setTimeout(() => {
+      func();
+    }, delay);
+  };
+}
 
 function App() {
+  const [search, setSearch] = useState("");
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  async function getData() {
+    const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${search}`);
+    setData(response.data.results);
+    console.log(response.data, "data");
+  }
+
+  useEffect(() => {
+    console.log("searching ")
+    const debouncedGetData = debounce(getData);
+    debouncedGetData();
+    return () => {
+      clearTimeout(debouncedGetData);
+    };
+  }, [search]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      {data.length > 0 && (
+        <div>
+          <input
+            placeholder="search"
+            style={{}}
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+            }}
+          />
+          <div
+            style={{
+              display: "flex",
+              width: "100%",
+              flexWrap: "wrap",
+              justifyContent: "space-around",
+            }}
+          >
+            {data.map((pokemon) => {
+              return <Card key={pokemon.name} name={pokemon.name} />;
+            })}
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 

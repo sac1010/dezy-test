@@ -41,7 +41,7 @@ function App() {
 
     debounceTimeout.current = setTimeout(() => {
       getData(val);
-    }, 3000);
+    }, 500);
   }
 
   return (

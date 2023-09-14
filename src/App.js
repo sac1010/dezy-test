@@ -1,18 +1,17 @@
 import logo from "./logo.svg";
 import "./App.css";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Card from "./components/Card";
 import axios from "axios";
 import SearchCard from "./components/SearchCard";
-
 
 function App() {
   const [search, setSearch] = useState("");
   const [data, setData] = useState([]);
   const [searchData, setSearchData] = useState();
-  let debounceTimeout = 0
+  const debounceTimeout = useRef(null);
 
-  async function getData() {
+  async function getData(search = "") {
     try {
       const response = await axios.get(
         `https://pokeapi.co/api/v2/pokemon/${search}`
@@ -30,15 +29,20 @@ function App() {
   }
 
   useEffect(() => {
+    getData()
+  }, []);
+
+  const handleSearch = (val)=>{
+    setSearch(val);
     console.log("searching ");
-    if (debounceTimeout) {
-      clearTimeout(debounceTimeout);
+    if (debounceTimeout.current !== null) {
+      clearTimeout(debounceTimeout.current);
     }
 
-    debounceTimeout = setTimeout(() => {
-      getData()
-    }, 1000);
-  }, [search]);
+    debounceTimeout.current = setTimeout(() => {
+      getData(val);
+    }, 3000);
+  }
 
   return (
     <>
@@ -54,7 +58,7 @@ function App() {
           placeholder="search"
           value={search}
           onChange={(e) => {
-            setSearch(e.target.value);
+            handleSearch(e.target.value)
           }}
         />
       </div>
@@ -85,7 +89,10 @@ function App() {
             gap: "20px",
           }}
         >
-          <SearchCard name={searchData.forms[0].name} abilities = {searchData.abilities}/>
+          <SearchCard
+            name={searchData.forms[0].name}
+            abilities={searchData.abilities}
+          />
         </div>
       ) : (
         <div>No results found</div>

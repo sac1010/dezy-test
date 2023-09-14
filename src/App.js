@@ -35,9 +35,6 @@ function App() {
     console.log("searching ")
     const debouncedGetData = debounce(getData);
     debouncedGetData();
-    return () => {
-      clearTimeout(debouncedGetData);
-    };
   }, [search]);
 
   return (
